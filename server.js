@@ -11,7 +11,8 @@ app.use(express.json());
 
 // ตั้งค่า LINE config
 const config = {
-    channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN
+    channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
+    channelSecret: process.env.CHANNEL_SECRET || 'dummy-secret-for-now'
 };
 const client = new line.Client(config);
 
@@ -43,7 +44,13 @@ app.post('/api/send-line-message', async (req, res) => {
 });
 
 // Webhook endpoint (สำหรับรับเหตุการณ์จาก LINE)
-app.post('/webhook', line.middleware(config), async (req, res) => {
+app.post('/webhook', (req, res, next) => {
+    // ถ้ามี CHANNEL_SECRET ใช้ middleware, ไม่มีก็ skip
+    if (process.env.CHANNEL_SECRET && process.env.CHANNEL_SECRET !== 'dummy-secret-for-now') {
+        return line.middleware(config)(req, res, next);
+    }
+    next();
+}, async (req, res) => {
     try {
         const events = req.body.events;
         
