@@ -81,8 +81,22 @@ app.get('/health', (req, res) => {
     res.json({ status: 'OK', message: 'LINE Backend is running' });
 });
 
+// Root endpoint
+app.get('/', (req, res) => {
+    res.json({ 
+        status: 'OK', 
+        message: 'LINE Backend API for Face Recognition System',
+        endpoints: {
+            health: '/health',
+            sendMessage: 'POST /api/send-line-message',
+            webhook: 'POST /webhook'
+        }
+    });
+});
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server is running on http://localhost:${PORT}`);
-    console.log(`📱 Webhook URL: http://localhost:${PORT}/webhook`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server is running on port ${PORT}`);
+    console.log(`📱 Health check: /health`);
+    console.log(`📱 Webhook: /webhook`);
 });
